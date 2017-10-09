@@ -65,6 +65,48 @@ Then click "test configuration" and afterward "initialize".
 
 Copy the php script to _/var/www/html/tt-rss_ as _config.php_ as instructed.
 
+## Setup feeds auto update
+
+First, change _tt-rss_ folder's owner to _www-data_, so we will not be bothered by `Can't create lockfile` problem.
+
+```
+chown -R www-data:www-data /var/www/html/tt-rss/
+```
+
+Then write daemon for auto update service at _/etc/systemd/system/ttrss-updater.service_
+
+```
+emacs /etc/systemd/system/ttrss-updater.service
+```
+
+Add following lines:
+
+```
+[Unit]
+Description=ttrss_backend
+After=network.target postgresql.service
+
+[Service]
+User=www-data
+ExecStart=/var/www/html/tt-rss/update_daemon2.php
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable it by
+
+```
+systemctl start ttrss-updater
+systemctl enable ttrss-updater
+```
+
+Logs can be  viewed by
+
+```
+journalctl -u ttrss-updater
+```
+
 ## Setup virtual host
 
 Edit virtual host configuration file
@@ -112,9 +154,31 @@ to
 define('SELF_URL_PATH', 'http://www.yourdomain.com/');
 ```
 
+## Customize
+
+Themes can be found at https://git.tt-rss.org/git/tt-rss/wiki/Themes
+
+Basicly, themes can be installed by copy _*.css_ and folder with the same name to _/var/www/html/tt-rss/themes_ folder.
+
+Also, plugins can be installed copy to _/var/www/html/tt-rss/plugins_.
+
+The following settings are suggested:
+
+| Setting                                  | Value      |
+| ---------------------------------------- | ---------- |
+| `Combined feed display`                  | `enabled`  |
+| `Automatically expand articles in combined mode` | `disabled` |
+| `Show content preview in headlines list` | `disabled` |
+
+Or, `disabled combined mode, enabled widescreen mode` suggested.
+
 ## Reference
 
 1. https://git.tt-rss.org/git/tt-rss/wiki/InstallationNotes
-2. https://websetnet.com/host-rss-system-linux-tiny-tiny-rss/
-3. https://www.digitalocean.com/community/tutorials/how-to-install-ttrss-with-nginx-for-debian-7-on-a-vps
-4. https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-14-04-lts
+2. https://git.tt-rss.org/git/tt-rss/wiki/UpdatingFeeds
+3. https://websetnet.com/host-rss-system-linux-tiny-tiny-rss/
+4. https://www.digitalocean.com/community/tutorials/how-to-install-ttrss-with-nginx-for-debian-7-on-a-vps
+5. https://www.linode.com/docs/web-servers/apache/host-your-own-rss-reader-with-tiny-tiny-rss-on-centos-7
+6. https://hostpresto.com/community/tutorials/how-to-install-tiny-tiny-rss-on-centos-7/
+7. https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-14-04-lts
+8. https://github.com/naeramarth7/clean-greader
