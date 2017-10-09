@@ -59,12 +59,62 @@ chmod -R 777 feed-icons
 chmod -R 777 lock
 ```
 
-Navigate to _www.yourdomain.com/tt-rss/install_. Fill the form with database setup informations used before, notice to leave _hostname_ empty. Then click "test configuration" and afterward "initialize". 
+Navigate to _www.yourdomain.com/tt-rss/install_. Fill the form with database setup informations used before, notice to leave _hostname_ empty. The domain name can be left unchanged.
+
+Then click "test configuration" and afterward "initialize". 
 
 Copy the php script to _/var/www/html/tt-rss_ as _config.php_ as instructed.
+
+## Setup virtual host
+
+Edit virtual host configuration file
+
+```
+emacs /etc/apache2/sites-available/yourdomain.com.conf
+```
+
+Add lines like below:
+
+```
+<VirtualHost *:80>
+    ServerAdmin admin@yourdomain.com
+    ServerName yourdomain.com
+    ServerAlias www.yourdomain.com
+    DocumentRoot /var/www/html/tt-rss
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+Then run
+
+```
+a2ensite yourdomain.com.conf
+service apache2 reload
+```
+
+Then configure _ttrss_ to use this domain
+
+```
+cd /var/www/html/
+emacs ./config.php
+```
+
+Change this line 
+
+```
+define('SELF_URL_PATH', 'http://www.yourdomain.com/tt-rss');
+```
+
+to
+
+```
+define('SELF_URL_PATH', 'http://www.yourdomain.com/');
+```
 
 ## Reference
 
 1. https://git.tt-rss.org/git/tt-rss/wiki/InstallationNotes
 2. https://websetnet.com/host-rss-system-linux-tiny-tiny-rss/
 3. https://www.digitalocean.com/community/tutorials/how-to-install-ttrss-with-nginx-for-debian-7-on-a-vps
+4. https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-14-04-lts
