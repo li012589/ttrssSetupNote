@@ -1,4 +1,4 @@
-# Install TinyTinyRSS on debian8
+# Install TinyTinyRSS on debian
 
 \*all commands are assumed run by root
 
@@ -16,7 +16,13 @@ apt-get install apache2
 Run
 
 ```
-apt-get install php5 php5-pgsql php5-fpm php-apc php5-curl php5-cli
+apt-get install php php-pgsql php-fpm php-curl php-cli php-apcu php-xml php-mbstring
+```
+
+Or (in debian 8)
+
+```
+apt install php5 php5-pgsql php5-fpm php-apc php5-curl php5-cli
 ```
 
 ## Install PostgreSQL
@@ -50,13 +56,7 @@ git clone https://tt-rss.org/git/tt-rss.git tt-rss
 First, repair permissions problems:
 
 ```
-cd /var/www/html/
-chmod -R 777 cache/images
-chmod -R 777 cache/upload
-chmod -R 777 cache/export
-chmod -R 777 cache/js
-chmod -R 777 feed-icons
-chmod -R 777 lock
+chown -R www-data:www-data /var/www/html/tt-rss/
 ```
 
 Navigate to _www.yourdomain.com/tt-rss/install_. Fill the form with database setup informations used before, notice to leave _hostname_ empty. The domain name can be left unchanged.
@@ -67,7 +67,7 @@ Copy the php script to _/var/www/html/tt-rss_ as _config.php_ as instructed.
 
 ## Setup feeds auto update
 
-First, change _tt-rss_ folder's owner to _www-data_, so we will not be bothered by `Can't create lockfile` problem.
+First, change _tt-rss_ folder's owner to _www-data_, so we will not be bothered by `Can't create lockfile` problem (**this is done before**).
 
 ```
 chown -R www-data:www-data /var/www/html/tt-rss/
@@ -138,7 +138,7 @@ service apache2 reload
 Then configure _ttrss_ to use this domain
 
 ```
-cd /var/www/html/
+cd /var/www/html/tt-rss
 emacs ./config.php
 ```
 
