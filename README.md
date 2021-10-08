@@ -16,7 +16,7 @@ apt-get install apache2
 Run
 
 ```
-apt-get install php php-pgsql php-fpm php-curl php-cli php-apcu php-xml php-mbstring
+apt-get install php php-pgsql php-fpm php-curl php-cli php-apcu php-xml php-mbstring php-intl libapache2-mod-php
 ```
 
 Or (in debian 8)
@@ -59,12 +59,30 @@ First, repair permissions problems:
 chown -R www-data:www-data /var/www/html/tt-rss/
 ```
 
-Navigate to _www.yourdomain.com/tt-rss/install_. Fill the form with database setup informations used before, notice to leave _hostname_ empty. The domain name can be left unchanged.
+~~Navigate to _www.yourdomain.com/tt-rss/install_. Fill the form with database setup informations used before, notice to leave _hostname_ empty. The domain name can be left unchanged.~~
 
-Then click "test configuration" and afterward "initialize". 
+~~Then click "test configuration" and afterward "initialize". ~~
 
-Copy the php script to _/var/www/html/tt-rss_ as _config.php_ as instructed.
+~~Copy the php script to _/var/www/html/tt-rss_ as _config.php_ as instructed.~~
 
+Config with
+
+```
+cp ./config.php-dist ./config.php
+```
+And add these to the `config.php`
+```
+putenv('TTRSS_DB_HOST=localhost');
+putenv('TTRSS_DB_NAME=ttrss');
+putenv('TTRSS_DB_USER=www-data');
+putenv('TTRSS_DB_PASS=yourpasshere');
+putenv('TTRSS_SELF_URL_PATH=https://your.ip/tt-rss');
+define('_SKIP_SELF_URL_PATH_CHECKS', true);
+```
+Apply these changes by
+```
+sudo -u www-data php ./update.php --update-schema
+```
 ## Setup feeds auto update
 
 First, change _tt-rss_ folder's owner to _www-data_, so we will not be bothered by `Can't create lockfile` problem (**this is done before**).
